@@ -1,0 +1,23 @@
+#include<bits/stdc++.h>
+using namespace std;
+int a[25], n, r;
+
+void cs(int f, int t) {
+	a[t] = f;
+	for (int i = 1; f + i - 1 <= n; i++) {
+		if (t == r) {
+			for (int j = 1; j <= r; j++)
+				cout << setw(3) << a[j];
+			cout << endl;
+			return;
+		}
+		cs(f + i, t + 1);
+	}
+}
+int main() {
+	cin >> n >> r;
+	for (int i = 1; i + r - 1 <= n; i++)
+		cs(i, 1);
+
+	return 0;
+}
