@@ -1,0 +1,34 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+string cs(string l, string s) {
+	string n = l;
+	l = l.length() > s.length() ? l : s;
+	s = n.length() > s.length() ? s : n;
+	int* ans = new int[l.length() + 1];
+	for (int i = 0; i <= l.length(); i++)
+		ans[i] = 0;
+	int i = 0;
+	for (; i < s.length(); i++) {
+		ans[i] += l[l.length()-1-i] - '0' + s[s.length()-1-i] - '0';
+		ans[i + 1] += ans[i] / 10;
+		ans[i] %= 10;
+	}
+	for (; i < l.length(); i++) {
+		ans[i] += l[l.length()-1-i] - '0';
+		ans[i + 1] += ans[i] / 10;
+		ans[i] %= 10;
+	}
+	i = ans[i] == 0 ? i - 1 : i;
+	string k;
+	for (int j = i; j >=0; j--)
+		k += (char)(ans[j] + '0');
+	return k;
+}
+
+int main() {
+	string m, n;
+	cin >> m >> n;
+	cout << cs(m, n);
+	return 0;
+}
