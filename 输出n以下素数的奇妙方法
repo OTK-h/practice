@@ -1,0 +1,12 @@
+#include<bits/stdc++.h>
+using namespace std;
+bool a[101];
+int main() {
+	for(int i = 2;i<101;i++)
+		if (!a[i]) {
+			cout << i << ' ';
+			for (int j = i * 2; j < 101; j += i)
+				a[j] = 1;
+		}
+	return 0;
+}
