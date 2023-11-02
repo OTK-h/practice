@@ -1,0 +1,46 @@
+#include<bits/stdc++.h>
+using namespace std;
+int main() {
+	int La, Lb;
+	cin >> La >> Lb;
+	int* a = new int[La];
+	int* b = new int[Lb];
+	for (int i = 0; i < La; i++)
+		cin >> a[i];
+	for (int i = 0; i < Lb; i++)
+		cin >> b[i];
+	int count1 = 0, count2 = 0;
+	for (int i = 0; i < La; i++) {
+		if (a[i] == b[0]) {
+			for (int j = i + 1, k = 1; j < La; j++, k++)
+				if (a[j] != b[k])
+					goto F1;
+			count1 = La - i;
+			break;
+		}
+	F1:continue;
+	}
+	for (int i = 0; i < Lb; i++) {
+		if (b[i] == a[0]) {
+			for (int j = i + 1, k = 1; j < Lb; j++, k++)
+				if (b[j] != a[k])
+					goto F2;
+			count2 = Lb - i;
+			break;
+		}
+	F2:continue;
+	}
+	if (count1 >= count2) {
+		for (int i = 0; i < La ; i++)
+			cout << a[i] << ' ';
+		for (int i = count1; i < Lb; i++)
+			cout << b[i] << ' ';
+	}
+	else {
+		for (int i = 0; i < Lb; i++)
+			cout << b[i] << ' ';
+		for (int i = count2; i < La; i++)
+			cout << a[i] << ' ';
+	}
+	return 0;
+}
