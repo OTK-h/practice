@@ -1,0 +1,75 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+bool compare(string s1,string s2) {
+	int u = s1.length(), v = s2.length();
+	if (u != v)
+		return u > v;
+	for (int i = 0; i < u; i++)
+		if (s1[i] != s2[i])
+			return s1[i] > s2[i];
+	return 1;
+}
+
+string jiafa(string l, string s) {
+	string n = l;
+	l = l.length() > s.length() ? l : s;
+	s = n.length() > s.length() ? s : n;
+	int* ans = new int[l.length() + 1];
+	for (int i = 0; i <= l.length(); i++)
+		ans[i] = 0;
+	int i = 0;
+	for (; i < s.length(); i++) {
+		ans[i] += l[l.length()-1-i] - '0' + s[s.length()-1-i] - '0';
+		ans[i + 1] += ans[i] / 10;
+		ans[i] %= 10;
+	}
+	for (; i < l.length(); i++) {
+		ans[i] += l[l.length()-1-i] - '0';
+		ans[i + 1] += ans[i] / 10;
+		ans[i] %= 10;
+	}
+	i = ans[i] == 0 ? i - 1 : i;
+	string k;
+	for (int j = i; j >=0; j--)
+		k += (char)(ans[j] + '0');
+	return k;
+}
+
+void jianfa(string m, string n) {
+	int flag = 0;
+	if (!compare(m, n)) {
+		flag = 1;
+		string temp = m;
+		m = n;
+		n = temp;
+	}
+	int Lm = m.length(), Ln = n.length();
+	int a[1000] = { 0 }, b[1000] = { 0 }, ans[1000] = {0};
+	for (int i = 0; i < Lm; i++)
+		a[Lm - i] = m[i] - '0';
+	for (int i = 0; i < Ln; i++)
+		b[Ln - i] = n[i] - '0';
+	int x = max(Lm, Ln);
+	for (int i = 1; i <= x; i++) {
+		if (a[i] < b[i]) {
+			a[i + 1]--;
+			a[i] += 10;
+		}
+		ans[i] = a[i] - b[i];
+	}
+	while (ans[x] == 0 && x > 1)
+		x--;
+	if (flag == 1)
+		cout << '-';
+	for (int i = x; i > 0; i--)
+		cout << ans[i];
+}
+
+int main() {
+	string m, n;
+	cin >> m >> n;
+	cout << jiafa(m, n)<<' ';
+	cout << jianfa(m,n)<<' ';
+	return 0;
+}
