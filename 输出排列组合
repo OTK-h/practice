@@ -14,7 +14,7 @@ void pailie(int step) {
 		if (!v[i]) {
 			a[step] = i;
 			v[i] = 1;
-			cs(step + 1);
+			pailie(step + 1);
 			v[i] = 0;
 		}
 	}
