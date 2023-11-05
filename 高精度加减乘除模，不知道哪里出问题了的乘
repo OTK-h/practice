@@ -87,8 +87,8 @@ string jianfa(string m, string n) {
 		for (int i = Lm; i > 0; i--)
 			k += (char)(ans[i] + '0');
 		delete[]ans;
-		return k;
 	}
+	return k;
 }
 
 string chengfa(string m, string n) {
