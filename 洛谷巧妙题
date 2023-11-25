@@ -1,11 +1,9 @@
-
+//P1012 拼数
 #include<bits/stdc++.h>
 using namespace std;
-
 bool cs(string m, string n) {
 	return m + n > n + m;
 }
-
 int main() {
 	int n; cin >> n;
 	string* a = new string[n + 1];
@@ -21,13 +19,11 @@ int main() {
 		cout << 0;
 		return 0;
 	}
-
 	for (int i = 1; i < n; i++) {
 		string temp = "0";
 		int k = 0;
 		for (int j = 1; j <= n; j++) {
-			if (!b[j])
-				continue;
+			if (!b[j]) continue;
 			if (cs(a[j], temp)) {
 				k = j;
 				temp = a[j];
@@ -41,5 +37,21 @@ int main() {
 			cout << a[i];
 			break;
 		}
+	return 0;
+}
+
+//P1161 开灯
+#include<bits/stdc++.h>
+using namespace std;
+int main() {
+	int n, ans = 0;
+	double a, t;
+	cin >> n;
+	for (int i = 0; i < n; i++) {
+		cin >> a >> t;
+		for (int j = 1; j <= t; j++) 
+			ans ^= (int)(a * j);
+	}
+	cout << ans;
 	return 0;
 }
