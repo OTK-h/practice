@@ -1,0 +1,204 @@
+string chengfa(string m, string n) {
+	string k;
+	if (m == "0" || n == "0")
+		k += "0";
+	else {
+		int Lm = m.length();
+		int Ln = n.length();
+		int x = Lm + Ln;
+		int* a = new int[Lm + 1]();
+		int* b = new int[Ln + 1]();
+		int* ans = new int[x + 2]();
+		for (int i = 0; i < Lm; i++)
+			a[Lm - i] = m[i] - '0';
+		for (int i = 0; i < Ln; i++)
+			b[Lm - i] = n[i] - '0';
+		for (int i = 1; i <= Lm; i++) {
+			for (int j = 1; j <= Ln; j++) {
+				ans[i + j - 1] += a[i] * b[j];
+				ans[i + j] += ans[i + j - 1] / 10;
+				ans[i + j - 1] %= 10;
+			}
+		}
+		delete[]a;
+		delete[]b;
+		while (ans[x] == 0 && x > 0)
+			x--;
+		for (int i = x; i > 0; i--)
+			k += (char)(ans[i] + '0');
+		delete[]ans;
+	}
+	return k; 
+}
+
+
+
+#include <bits/stdc++.h>
+using namespace std;
+//最大能接受1000位数
+//len为符号以外的长度
+struct BigInt {
+    int len;
+    int sign;
+    char data[1005];
+};
+int compare(BigInt bigint1, BigInt bigint2);
+void print_bigint(struct BigInt bigint);
+BigInt read_bigint();
+BigInt add_bigint(BigInt bigint1, BigInt bigint2);
+BigInt sub_bigint(BigInt bigint1, BigInt bigint2);
+
+int main() {
+    BigInt bigint1 = read_bigint();
+    BigInt bigint2 = read_bigint();
+    print_bigint(add_bigint(bigint1, bigint2));
+    print_bigint(sub_bigint(bigint1, bigint2));
+    return 0;
+}
+
+//判断bigint1的绝对值是否大于bigint2的绝对值，相同返回2
+int compare(BigInt bigint1, BigInt bigint2) {
+    if (bigint1.len != bigint2.len)
+        return bigint1.len > bigint2.len;
+    for (int i = 1; i <= bigint1.len; i++)
+        if (bigint1.data[i] != bigint2.data[i])
+            return bigint1.data[i] > bigint2.data[i];
+    return 2;
+}
+BigInt read_bigint() {
+    BigInt bigint;
+    string x;
+    cin >> x;
+    bigint.len = x.length();
+    if (x[0] == '-') {
+        bigint.sign = 0;
+        bigint.len--;
+        for (int i = 1; i <= bigint.len; i++)
+            bigint.data[i] = x[i];
+    }
+    else {
+        bigint.sign = 1;
+        for (int i = 1; i <= bigint.len; i++)
+            bigint.data[i] = x[i - 1];
+    }
+    return bigint;
+}
+void print_bigint(BigInt bigint) {
+    if (!bigint.sign)
+        cout << '-';
+    for (int i = 1; i <= bigint.len; i++)
+        cout << bigint.data[i];
+    cout << '\n';
+}
+BigInt add_bigint(BigInt bigint1, BigInt bigint2) {
+    BigInt ret;
+    if (bigint1.data[1] == '0' && bigint2.data[1] == '0') {
+        ret.sign = 1;
+        ret.len = 1;
+        ret.data[1] = '0';
+    }
+    else {
+        if (bigint1.sign != bigint2.sign) {
+            bigint2.sign ^= 1;
+            return sub_bigint(bigint1, bigint2);
+        }
+        //符号不同，使用减法
+        else {
+            ret.sign = bigint1.sign;
+            //确定答案符号
+            if (!compare(bigint1, bigint2))
+                swap(bigint1, bigint2);
+            //使绝对值大的数为bigint1
+            int* a = new int[bigint1.len + 1]();
+            int* b = new int[bigint2.len + 1]();
+            int* ans = new int[bigint1.len + 2]();
+            for (int i = 1; i <= bigint1.len; i++)
+                a[bigint1.len - i + 1] = bigint1.data[i] - '0';
+            for (int i = 1; i <= bigint2.len; i++)
+                b[bigint2.len - i + 1] = bigint2.data[i] - '0';
+            for (int i = 1; i <= bigint2.len; i++) {
+                ans[i] += a[i] + b[i];
+                ans[i + 1] += ans[i] / 10;
+                ans[i] %= 10;
+            }
+            for (int i = bigint2.len + 1; i <= bigint1.len; i++) {
+                ans[i] += a[i];
+                ans[i + 1] += ans[i] / 10;
+                ans[i] %= 10;
+            }
+            delete[]a;
+            delete[]b;
+            int x = bigint1.len + 1;
+            while (ans[x] == 0 && x > 0)
+                x--;
+            ret.len = x;
+            for (int i = x; i > 0; i--)
+                ret.data[x - i + 1] = (char)(ans[i] + '0');
+            delete[]ans;
+        }
+    }
+    return ret;
+}
+BigInt sub_bigint(BigInt bigint1, BigInt bigint2) {
+    BigInt ret;
+    if (bigint1.data[1] == '0' && bigint2.data[1] == '0') {
+        ret.sign = 1;
+        ret.len = 1;
+        ret.data[1] = '0';
+    }
+    else {
+        if (bigint1.sign != bigint2.sign) {
+            bigint2.sign ^= 1;
+            return add_bigint(bigint1, bigint2);
+        }
+        //若异号，可化为加法
+        if (compare(bigint1, bigint2) == 2) {
+            ret.sign = 1;
+            ret.len = 1;
+            ret.data[1] = '0';
+        }
+        //特判结果0
+        else {
+            if (compare(bigint1, bigint2))
+                ret.sign = bigint1.sign;
+            else {
+                ret.sign = bigint1.sign ^ 1;
+                swap(bigint1, bigint2);
+            }
+            //确定答案的符号
+            //使绝对值大的为bigint1，则去掉符号后结果为正
+            int* a = new int[bigint1.len + 1]();
+            int* b = new int[bigint2.len + 1]();
+            int* ans = new int[bigint1.len + 1]();
+            for (int i = 1; i <= bigint1.len; i++)
+                a[bigint1.len - i + 1] = bigint1.data[i] - '0';
+            for (int i = 1; i <= bigint2.len; i++)
+                b[bigint2.len - i + 1] = bigint2.data[i] - '0';
+            for (int i = 1; i <= bigint2.len; i++) {
+                if (a[i] < b[i]) {
+                    a[i + 1]--;
+                    a[i] += 10;
+                }
+                ans[i] = a[i] - b[i];
+            }
+            for (int i = bigint2.len + 1; i <= bigint1.len; i++) {
+                if (a[i] < 0) {
+                    a[i] += 10;
+                    a[i + 1]--;
+                }
+                ans[i] += a[i];
+            }
+            delete[]a;
+            delete[]b;
+            int x = bigint1.len;
+            while (ans[x] == 0 && x > 0)
+                x--;
+            ret.len = x;
+            for (int i = x; i > 0; i--)
+                ret.data[x - i + 1] = (char)(ans[i] + '0');
+            delete[]ans;
+        }
+    }
+    return ret;
+}
+
