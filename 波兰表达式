@@ -1,0 +1,10 @@
+int polish() {
+	char a; cin >> a;
+	switch (a) {
+	case '+':return polish() + polish(); break;
+	case '-':return polish() - polish(); break;
+	case '*':return polish() * polish(); break;
+	case '/':return polish() / polish(); break;
+	default:return (int)(a - '0');
+	}
+}
