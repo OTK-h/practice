@@ -1,10 +1,10 @@
-int polish() {
-	char a; cin >> a;
-	switch (a) {
-	case '+':return polish() + polish(); break;
-	case '-':return polish() - polish(); break;
-	case '*':return polish() * polish(); break;
-	case '/':return polish() / polish(); break;
-	default:return (int)(a - '0');
+double polish() {
+	char a[100]; cin >> a;
+	switch (a[0]) {
+	case '+' : return polish() + polish(); break;
+	case '-' : return polish() - polish(); break;
+	case '*' : return polish() * polish(); break;
+	case '/' : return polish() / polish(); break;
+	default : return atof(a);
 	}
 }
