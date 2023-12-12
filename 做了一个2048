@@ -1,0 +1,241 @@
+#include<bits/stdc++.h>
+#include<windows.h>
+using namespace std;
+const int n = 4; //行数和列数
+const int N = n * n; //总共有N个数字
+int step; // 统计当前操作了几步
+int screen[n][n]; //要输出的屏幕
+int row, column; //行列
+int count_0 = 16; //统计当前屏幕上有多少个0，若有0个则判定为失败
+int new_place[16]; //判断新生成的数在屏幕上的位置，最多有16个位置
+int current_score, history_score; //记录分数
+
+void print_screen(); //输出游戏界面
+void print_color(int a); //输出彩色数字
+void start_game(); //开始游戏，初始化
+bool isContinue(); //判断游戏是否结束
+void random_place(); //随机新数字的位置
+int random_num(); //随机生成新数字2或4
+void turn_direction(); //接受操作的方向
+void turn(char x); //操作方向具体实现
+void translation(char x); //操作方向具体实现的一部分
+int end_game(); //结束游戏
+
+int main() {
+Flag:
+	start_game();
+	do {
+		random_place();
+		print_screen();
+		turn_direction();
+		system("cls");
+	} while (isContinue());
+	if (end_game()==1)
+		goto Flag;
+	return 0;
+}
+
+void start_game() {
+	for (int i = 0; i < N; i++) screen[0][i] = 0; //屏幕初始化为0
+	srand((unsigned)time(NULL));
+	int x = (rand() % INT_MAX) % 4;
+	screen[0][x*n] = random_num(); //四个角随机一个填数
+	history_score = max(current_score, history_score); //计算历史最高分数
+	current_score = 0; //当前分数初始化
+	step = 0; //操作次数初始化
+	count_0 = 16; //屏幕上数字为0的位置初始化
+	cout << "________   _______       _____     ______" << endl
+		<< "\\_____  \\  \\   _  \\     /  |  |   /  __  \\ " << endl
+		<< " / _ ___/  /  /_\\  \\   /   |  |_  >      <" << endl
+		<< "/       \\  \\  \\_/   \\ /    ^   / /   --   \\ " << endl
+		<< "\\_______ \\  \\_____  / \\____   |  \\______  /" << endl
+		<< "	\\/        \\/       |__|         \\/ " << endl;
+	//一个好看的字符画
+	Sleep(300);
+	cout << "历史最高得分：";
+	cout << history_score;
+	cout << '\n';
+	system("pause");
+	system("cls");
+}
+int random_num() {
+	srand((unsigned)time(NULL));
+	int x = (rand() % INT_MAX) % 3;
+	x = x == 0 ? 1 : x; //2的概率大于4
+	return (int)pow(2, x);
+}
+void random_place() {
+	int x = (rand() % INT_MAX) % count_0; //%count_0得到new_place[]的前count_0个数中随机一个
+	screen[0][new_place[x]] = random_num(); //令屏幕上随机一个为0的位置变为新数字
+}
+void print_screen() {
+	cout << "----------------------------------------" << '\n';
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			cout << '\t'; //制表好看
+			print_color(screen[i][j]);
+		}
+		cout << '\n';
+	}
+	cout<< "----------------------------------------" << '\n';
+	cout << "目前已经行动次数：" << step << '\n';
+	cout << "你的历史最高得分：" << history_score << '\n';
+	cout << "你的目前得分：" << current_score << '\n';
+	cout << "输入wasd来控制方向：";
+}
+void print_color(int a) {
+	if (a == 0) cout << a;
+	else if (a < 4) printf("\033[0m\033[1;36m%d\033[0m", a);//cyan
+	else if (a < 32) printf("\033[0m\033[1;34m%d\033[0m", a);//blue
+	else if (a < 128) printf("\033[0m\033[1;35m%d\033[0m", a);//purple
+	else if (a < 600)printf("\033[0m\033[1;33m%d\033[0m", a);//yellow
+	else if (a < 1000) printf("\033[0m\033[1;32m%d\033[0m", a);//green
+	else if (a < 2000) printf("\033[0m\033[1;31m%d\033[0m", a);//red
+}
+bool isContinue() {
+	count_0 = 0; //屏幕上为0的位置初始化
+	for (int i = 0; i < N; i++) {
+		if (screen[0][i] == 2048) return 0; //得到2048，结束
+		if (screen[0][i] == 0) new_place[count_0++] = i; //将屏幕上为0的位置存在new_place[]第count_0号位置，便于选择随机位置产生新数字
+	}
+	if (count_0 == 0) return 0; //既没有2048也没有空位，结束
+	return 1;
+}
+void turn_direction() {
+Flag:
+	char direction;
+	cin >> direction;
+	if (direction == 'w' || direction == 'a' || direction == 's' || direction == 'd') turn(direction);
+	else {
+		cout << "请重新输入：";
+		goto Flag;
+	}
+	step++;
+}
+void translation(char x) {
+	switch (x) { //如果操作方向前一个数为0，后一个数为0，即将后一个数向前平移一次，再重新循环。四个方向相同
+	case 'w':
+		for (row = 1; row < n; row++) {
+			if (screen[row - 1][column] == 0 && screen[row][column] != 0) {
+				swap(screen[row - 1][column], screen[row][column]);
+				row = 0;
+			}
+		}
+		break;
+	case 'a':
+		for (column = 1; column < n; column++) {
+			if (screen[row][column - 1] == 0 && screen[row][column] != 0) {
+				swap(screen[row][column - 1], screen[row][column]);
+				column = 0;
+			}
+		}
+		break;
+	case 's':
+		for (row = 1; row < n; row++) {
+			if (screen[row][column] == 0 && screen[row - 1][column] != 0) {
+				swap(screen[row - 1][column], screen[row][column]);
+				row = 0;
+			}
+		}
+		break;
+	case 'd':
+		for (column = 1; column < n; column++) {
+			if (screen[row][column - 1] != 0 && screen[row][column] == 0) {
+				swap(screen[row][column - 1], screen[row][column]);
+				column = 0;
+			}
+		}
+		break;
+	}
+}
+void turn(char x) {
+	switch (x) { //根据输入对行/列循环，先进行一次平移操作，再判断是否存在可以消掉的数，若有，获得相应的分，并再次平移
+	case 'w':
+		for (column = 0; column < n; column++) {
+			translation('w');
+			for (row = 1; row < n; row++) {
+				if (screen[row - 1][column] == screen[row][column] && screen[row][column] != 0) {
+					screen[row - 1][column] *= 2;
+					screen[row][column] = 0;
+					current_score += screen[row - 1][column];
+					translation('w');
+					row = 0;
+				}
+			}
+			translation('w');
+		}
+		break;
+	case 'a':
+		for (row = 0; row < n; row++) {
+			translation('a');
+			for (column = 1; column < n; column++) {
+				if (screen[row][column - 1] == screen[row][column] && screen[row][column] != 0) {
+					screen[row][column - 1] *= 2;
+					screen[row][column] = 0;
+					current_score += screen[row][column - 1];
+					translation('a');
+					column = 0;
+				}
+			}
+			translation('a');
+		}
+		break;
+	case 's':
+		for (column = 0; column < n; column++) {
+			translation('s');
+			for (row = 1; row < n; row++) {
+				if (screen[row - 1][column] == screen[row][column] && screen[row][column] != 0) {
+					screen[row][column] *= 2;
+					screen[row - 1][column] = 0;
+					current_score += screen[row][column];
+					translation('s');
+					row = 0;
+				}
+			}
+			translation('s');
+		}
+		break;
+	case 'd':
+		for (row = 0; row < n; row++) {
+			translation('d');
+			for (column = 1; column < n; column++) {
+				if (screen[row][column - 1] == screen[row][column] && screen[row][column] != 0) {
+					screen[row][column] *= 2;
+					screen[row][column - 1] = 0;
+					current_score += screen[row][column];
+					translation('d');
+					column = 0;
+				}
+			}
+			translation('d');
+		}
+		break;
+	}
+	history_score = max(history_score, current_score);
+}
+int end_game() {
+	int a = 0;
+	for (int i = 0; i < N; i++) {
+		if (screen[0][i] == 2048) {
+			a = 1;
+			break;
+		}
+	}
+	if (a) 
+		for (int i = 0; i < 5; i++) {
+			cout << "win win win" << "\n";
+			Sleep(500);
+		} //胜利CG
+	else 
+		for (int i = 0; i < 5; i++) {
+			cout << "lose lose lose" << "\n";
+			Sleep(500);
+		} //战败CG
+	Sleep(2000);
+	cout << "你的最终得分是：";
+	cout << current_score << '\n';
+	cout << "扣1重开，扣0结束：";
+	cin >> a;
+	system("cls");
+	return a;
+}
