@@ -9,10 +9,15 @@ int row, column; //行列
 int count_0 = 16; //统计当前屏幕上有多少个0，若有0个则判定为失败
 int new_place[16]; //判断新生成的数在屏幕上的位置，最多有16个位置
 int current_score, history_score; //记录分数
+int initial_place[4] = { 0,3,12,15 }; //初始在四个角之一生成数字
+int degree, disaster_count = 100, disaster_bool;
 
+
+void game_intro(); //输出游戏介绍
 void print_screen(); //输出游戏界面
 void print_color(int a); //输出彩色数字
 void start_game(); //开始游戏，初始化
+void degree_choose(); //选择难易度 & 趣味小玩法
 bool isContinue(); //判断游戏是否结束
 void random_place(); //随机新数字的位置
 int random_num(); //随机生成新数字2或4
@@ -22,8 +27,10 @@ void translation(char x); //操作方向具体实现的一部分
 int end_game(); //结束游戏
 
 int main() {
+	game_intro();
 Flag:
 	start_game();
+	degree_choose();
 	do {
 		random_place();
 		print_screen();
@@ -35,15 +42,28 @@ Flag:
 	return 0;
 }
 
+void game_intro() {
+	cout << "**********————__________introduction__________————**********\n\n";
+	cout << "try to get a 2048 in the screen\n\n";
+	system("pause");
+	cout << "\ninput \"awsd\" to control the direction\n\n";
+	system("pause");
+	cout<<"\nevery number in the screen move in that direction, and get combined if the same number meet each other\n\n";
+	system("pause");
+	cout<<"\nevery time you move, your score will minus one, and then plus the number that get combined this turn\n\n";
+	system("pause");
+	system("cls");
+	//帅气的全英文介绍
+}
 void start_game() {
 	for (int i = 0; i < N; i++) screen[0][i] = 0; //屏幕初始化为0
-	srand((unsigned)time(NULL));
-	int x = (rand() % INT_MAX) % 4;
-	screen[0][x*n] = random_num(); //四个角随机一个填数
+	int x = rand() % 4;
+	screen[0][initial_place[x]] = random_num(); //四个角随机一个填数
 	history_score = max(current_score, history_score); //计算历史最高分数
 	current_score = 0; //当前分数初始化
 	step = 0; //操作次数初始化
 	count_0 = 16; //屏幕上数字为0的位置初始化
+	srand((unsigned)time(NULL)); //随机数种子
 	cout << "________   _______       _____     ______" << endl
 		<< "\\_____  \\  \\   _  \\     /  |  |   /  __  \\ " << endl
 		<< " / _ ___/  /  /_\\  \\   /   |  |_  >      <" << endl
@@ -51,22 +71,61 @@ void start_game() {
 		<< "\\_______ \\  \\_____  / \\____   |  \\______  /" << endl
 		<< "	\\/        \\/       |__|         \\/ " << endl;
 	//一个好看的字符画
-	Sleep(300);
-	cout << "历史最高得分：";
+	cout << "history highest score: ";
 	cout << history_score;
 	cout << '\n';
 	system("pause");
 	system("cls");
 }
+void degree_choose() {
+K1:
+	cout << "\nchoose your degree(input the number ahead directly)\n\n"
+		<< "1.eazy: create one number every time you move, you will get normal score\n\n"
+		<< "2.hard: create two number every time you move. you will get an additional score\n\n"
+		<< "3.lunatic: create three number every time you move, you will get more additional score\n\n";
+	string x;
+	cin >> x;
+	switch (x[0]) {
+	case '1': degree = 1; break;
+	case '2': degree = 2; break;
+	case '3': degree = 3; break;
+	default:
+		cout << "input again please: \n";
+		goto K1;
+	}
+	system("cls");
+	cout << "\nwant to get some disasters? (y/n): \n";
+K2:
+	cin >> x;
+	switch (x[0]) {
+	case 'y': disaster_bool = 1; break;
+	case 'Y': disaster_bool = 1; break;
+	case 'n': disaster_bool = 0; break;
+	case 'N': disaster_bool = 0; break;
+	default:
+		cout << "input again please: \n";
+		goto K2;
+	}
+	system("cls");
+}
 int random_num() {
-	srand((unsigned)time(NULL));
-	int x = (rand() % INT_MAX) % 3;
+	int x = rand() % 3;
 	x = x == 0 ? 1 : x; //2的概率大于4
 	return (int)pow(2, x);
 }
 void random_place() {
-	int x = (rand() % INT_MAX) % count_0; //%count_0得到new_place[]的前count_0个数中随机一个
+	int x = rand() % count_0; //%count_0得到new_place[]的前count_0个数中随机一个
 	screen[0][new_place[x]] = random_num(); //令屏幕上随机一个为0的位置变为新数字
+	for (int i = 1; i < degree; i++) {
+		int temp = (x + i) % count_0;
+		screen[0][new_place[temp]] = random_num();
+	}
+	if (!disaster_count) {
+		for (int i = 0; i < N; i++)
+			screen[0][i] = 0;
+		disaster_count = 100 * (++disaster_bool);
+		cout << "\ndisaster coming! and all your numbers have been destroyed.\n\nyou have nothing but a score now\n\n";
+	}
 }
 void print_screen() {
 	cout << "----------------------------------------" << '\n';
@@ -78,10 +137,11 @@ void print_screen() {
 		cout << '\n';
 	}
 	cout<< "----------------------------------------" << '\n';
-	cout << "目前已经行动次数：" << step << '\n';
-	cout << "你的历史最高得分：" << history_score << '\n';
-	cout << "你的目前得分：" << current_score << '\n';
-	cout << "输入wasd来控制方向：";
+	cout << "current step: " << step << '\n';
+	cout << "history highest score: " << history_score << '\n';
+	cout << "current score: " << current_score << '\n';
+	if (disaster_bool) cout << "\ndisaster approaching!!!  " << disaster_count--<<"\n\n";
+	cout << "input \"awsd\" to control the direction: ";
 }
 void print_color(int a) {
 	if (a == 0) cout << a;
@@ -96,20 +156,25 @@ bool isContinue() {
 	count_0 = 0; //屏幕上为0的位置初始化
 	for (int i = 0; i < N; i++) {
 		if (screen[0][i] == 2048) return 0; //得到2048，结束
-		if (screen[0][i] == 0) new_place[count_0++] = i; //将屏幕上为0的位置存在new_place[]第count_0号位置，便于选择随机位置产生新数字
+		if (screen[0][i] == 0) new_place[count_0++] = i; //将屏幕上为0的位置存储在new_place[]第count_0号位置，便于选择随机位置产生新数字
 	}
-	if (count_0 == 0) return 0; //既没有2048也没有空位，结束
+	if (count_0 < degree) return 0; //既没有2048也没有足够空位，结束
 	return 1;
 }
 void turn_direction() {
+	current_score = --current_score >= 0 ? current_score : 0; //每次行动分数减一，确保分数大于等于0
 Flag:
-	char direction;
+	string direction;
 	cin >> direction;
-	if (direction == 'w' || direction == 'a' || direction == 's' || direction == 'd') turn(direction);
-	else {
-		cout << "请重新输入：";
+	if(direction[0] == 'w' && direction[0] == 'a' && direction[0] == 's' && direction[0] == 'd') {
+		cout << "input again please: ";
 		goto Flag;
 	}
+	if (direction[1] != '\0') {
+		cout << "input again please: ";
+		goto Flag;
+	}
+	turn(direction[0]);
 	step++;
 }
 void translation(char x) {
@@ -157,7 +222,7 @@ void turn(char x) {
 				if (screen[row - 1][column] == screen[row][column] && screen[row][column] != 0) {
 					screen[row - 1][column] *= 2;
 					screen[row][column] = 0;
-					current_score += screen[row - 1][column];
+					current_score += screen[row - 1][column] * degree;
 					translation('w');
 					row = 0;
 				}
@@ -172,7 +237,7 @@ void turn(char x) {
 				if (screen[row][column - 1] == screen[row][column] && screen[row][column] != 0) {
 					screen[row][column - 1] *= 2;
 					screen[row][column] = 0;
-					current_score += screen[row][column - 1];
+					current_score += screen[row][column - 1] * degree;
 					translation('a');
 					column = 0;
 				}
@@ -187,7 +252,7 @@ void turn(char x) {
 				if (screen[row - 1][column] == screen[row][column] && screen[row][column] != 0) {
 					screen[row][column] *= 2;
 					screen[row - 1][column] = 0;
-					current_score += screen[row][column];
+					current_score += screen[row][column] * degree;
 					translation('s');
 					row = 0;
 				}
@@ -202,7 +267,7 @@ void turn(char x) {
 				if (screen[row][column - 1] == screen[row][column] && screen[row][column] != 0) {
 					screen[row][column] *= 2;
 					screen[row][column - 1] = 0;
-					current_score += screen[row][column];
+					current_score += screen[row][column] * degree;
 					translation('d');
 					column = 0;
 				}
@@ -232,10 +297,19 @@ int end_game() {
 			Sleep(500);
 		} //战败CG
 	Sleep(2000);
-	cout << "你的最终得分是：";
+	cout << "your final score: ";
 	cout << current_score << '\n';
-	cout << "扣1重开，扣0结束：";
-	cin >> a;
+	cout << "input 1 to continue, input 0 to end game: ";
+T:
+	string x;
+	cin >> x;
+	switch (x[0]) {
+	case '1': a = 1; break;
+	case '0': a = 0; break;
+	default:
+		cout << "\ninput again please: ";
+		goto T;
+	}
 	system("cls");
 	return a;
 }
