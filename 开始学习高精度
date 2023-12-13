@@ -1,58 +1,24 @@
-string chengfa(string m, string n) {
-	string k;
-	if (m == "0" || n == "0")
-		k += "0";
-	else {
-		int Lm = m.length();
-		int Ln = n.length();
-		int x = Lm + Ln;
-		int* a = new int[Lm + 1]();
-		int* b = new int[Ln + 1]();
-		int* ans = new int[x + 2]();
-		for (int i = 0; i < Lm; i++)
-			a[Lm - i] = m[i] - '0';
-		for (int i = 0; i < Ln; i++)
-			b[Lm - i] = n[i] - '0';
-		for (int i = 1; i <= Lm; i++) {
-			for (int j = 1; j <= Ln; j++) {
-				ans[i + j - 1] += a[i] * b[j];
-				ans[i + j] += ans[i + j - 1] / 10;
-				ans[i + j - 1] %= 10;
-			}
-		}
-		delete[]a;
-		delete[]b;
-		while (ans[x] == 0 && x > 0)
-			x--;
-		for (int i = x; i > 0; i--)
-			k += (char)(ans[i] + '0');
-		delete[]ans;
-	}
-	return k; 
-}
-
-
-
 #include <bits/stdc++.h>
 using namespace std;
-//最大能接受1000位数
 //len为符号以外的长度
 struct BigInt {
     int len;
     int sign;
-    char data[1005];
+    char data[5000];
 };
 int compare(BigInt bigint1, BigInt bigint2);
 void print_bigint(struct BigInt bigint);
 BigInt read_bigint();
 BigInt add_bigint(BigInt bigint1, BigInt bigint2);
 BigInt sub_bigint(BigInt bigint1, BigInt bigint2);
+BigInt mul_bigint(BigInt bigint1, BigInt bigint2);
 
 int main() {
     BigInt bigint1 = read_bigint();
     BigInt bigint2 = read_bigint();
     print_bigint(add_bigint(bigint1, bigint2));
     print_bigint(sub_bigint(bigint1, bigint2));
+    print_bigint(mul_bigint(bigint1, bigint2));
     return 0;
 }
 
@@ -201,4 +167,37 @@ BigInt sub_bigint(BigInt bigint1, BigInt bigint2) {
     }
     return ret;
 }
-
+BigInt mul_bigint(BigInt bigint1, BigInt bigint2) {
+    BigInt ret;
+    if (bigint1.data[1] == '0' || bigint2.data[1] == '0') {
+        ret.data[1] = '0';
+        ret.sign = 1;
+        ret.len = 1;
+    }
+    else {
+        ret.sign = bigint1.sign == bigint2.sign ? 1 : 0;
+        int x = bigint1.len + bigint2.len;
+        int* a = new int[bigint1.len + 1]();
+        int* b = new int[bigint2.len + 1]();
+        int* ans = new int[x + 2]();
+        for (int i = 1; i <= bigint1.len; i++)
+            a[bigint1.len - i + 1] = bigint1.data[i] - '0';
+        for (int i = 1; i <= bigint2.len; i++)
+            b[bigint2.len - i + 1] = bigint2.data[i] - '0';
+        for (int i = 1; i <= bigint1.len; i++) {
+            for (int j = 1; j <= bigint2.len; j++) {
+                ans[i + j - 1] += a[i] * b[j];
+                ans[i + j] += ans[i + j - 1] / 10;
+                ans[i + j - 1] %= 10;
+            }
+        }
+        delete[]a;
+        delete[]b;
+        while (ans[x] == 0) x--;
+        ret.len = x;
+        for (int i = x; i > 0; i--)
+            ret.data[x - i + 1] = (char)(ans[i] + '0');
+        delete[]ans;
+    }
+    return ret;
+}
