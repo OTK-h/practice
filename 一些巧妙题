@@ -72,7 +72,6 @@ int n;
 int V1, V2, V3;
 int x, y, z;
 int a1, b1, c1;
-
 int f(int a, int b, int c,int step) {
 	if (step > n) return 0;
 	if (a == a1 && b == b1 && c == c1) {
@@ -89,12 +88,42 @@ int f(int a, int b, int c,int step) {
 		else return 0;
 	}
 }
-
 int main() {
 	cin >> n;
 	cin >> V1 >> V2 >> V3;
 	cin >> x >> y >> z;
 	cin >> a1 >> b1 >> c1;
 	if (!f(x, y, z, 0)) cout << "No";
+	return 0;
+}
+
+
+//合并重叠区间
+#include<bits/stdc++.h>
+using namespace std;
+struct Node {
+	int l, r;
+};
+bool cmp(Node a, Node b) {
+	if (a.l != b.l) return a.l < b.l;
+	else return a.r <= b.r;
+}
+int main() {
+	int n; cin >> n;
+	Node* a = new Node[n]();
+	for (int i = 0; i < n; i++) cin >> a[i].l >> a[i].r;
+	sort(a, a + n, cmp);
+	for (int i = 0; i < n; i++) {
+		int j = i + 1;
+		for (; a[j].l < 0; j++);
+		for (; a[i].r >= a[j].l && j < n; j++) {
+			a[j].l = -1;
+			if(a[i].r<a[j].r) a[i].r = a[j].r;
+		}
+		i = j-1;
+	}
+	for (int i = 0; i < n; i++)
+		if (a[i].l > 0)
+			cout << a[i].l << ' ' << a[i].r << '\n';
 	return 0;
 }
