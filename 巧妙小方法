@@ -170,3 +170,30 @@ int main() {
 	}
 	return 0;
 }
+
+
+//素数筛
+#include<bits/stdc++.h>
+using namespace std;
+bool a[101];
+int main() {
+	for(int i = 2;i<101;i++)
+		if (!a[i]) {
+			cout << i << ' ';
+			for (int j = i * 2; j < 101; j += i)
+				a[j] = 1;
+		}
+	return 0;
+}
+
+//波兰表达式
+double polish() {
+	char a[100]; cin >> a;
+	switch (a[0]) {
+	case '+' : return polish() + polish(); break;
+	case '-' : return polish() - polish(); break;
+	case '*' : return polish() * polish(); break;
+	case '/' : return polish() / polish(); break;
+	default : return atof(a);
+	}
+}
