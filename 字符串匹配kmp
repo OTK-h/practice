@@ -1,0 +1,39 @@
+vector<int> return_vector_next(string& s) {
+	vector<int> mygo;
+	mygo.push_back(0);
+	int cur_common_len = 0;
+	int i = 1;
+	int n = s.length();
+	while (i < n) {
+		if (s[i] == s[cur_common_len]) {
+			mygo.push_back(++cur_common_len);
+			++i;
+		}
+		else if (!cur_common_len) {
+			mygo.push_back(0);
+			++i;
+		}
+		else 
+			cur_common_len = mygo[cur_common_len - 1];
+	}
+	return mygo;
+}
+
+bool kmp_search(string& temp, string& goal) {
+	vector<int> mygo = return_vector_next(goal);
+	int i = 0, j = 0, n = temp.length(), m = goal.length();
+	while (i < n) {
+		if (temp[i] == goal[j]) {
+			++i;
+			++j;
+		}
+		else if (j) {
+			j = mygo[j - 1];
+		}
+		else {
+			++i;
+		}
+		if (j == m)
+			return 1;
+	}
+}
