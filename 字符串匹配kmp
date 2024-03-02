@@ -36,4 +36,5 @@ bool kmp_search(string& temp, string& goal) {
 		if (j == m)
 			return 1;
 	}
+	return 0;
 }
