@@ -1,0 +1,31 @@
+//单调栈是栈的一种变体，顾名思义，就是栈内元素按照单调递增或递减的顺序排列的栈。如果有新的元素入栈，栈调整过程中会将所有破坏单调性的栈顶元素出栈，并且出栈的元素不会再次入栈。
+//实现一个栈内元素类型为int的单调递增栈类
+//需要实现function函数，它接收两个参数：int数组arr和它的大小n。
+//对数组中的任意元素arr[i]，我们定义它的价值为v[i]=arr[i]-arr[j]，其中，j是满足j>i且arr[j]<arr[i]的最小下标，如果不存在这样的j，那么规定v[i]=arr[i]。
+//function返回每个元素的价值之和。
+//注：虽然本次OJ对时间复杂度不做要求，但本题期望的时间复杂度应该为O(n)。
+//注：你可以在Part-2的实现中使用Part-1中的所有接口和s成员变量，这两部分的测试将独立进行。
+
+int MonotonicStack::push(int element){
+    //TODO
+    int res=0;
+    while(!s.empty()&&s.top()>element){
+        res+=s.top()-element;
+        s.pop();
+    }
+    s.push(element);
+    return res;
+}
+
+int MonotonicStack::function(const int* arr,int n){
+    //TODO
+    int res=0;
+    for(int i=0;i<n;i++){
+        res+=push(arr[i]);
+    }
+    while(size()>0){
+        res+=top();
+        pop();
+    }
+    return res;
+}
