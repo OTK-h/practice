@@ -225,3 +225,28 @@ int main() {
 	//找出给出的排列的最长连续递降后缀，其长度记为 m(m < n)。
 	//找到最长递降后缀的之前的那个数，记为 pk，在最长递降后缀中找到比 pk大的数中最小的那个，交换这两个数。
 	//将交换后的序列的后 m 个数翻转。
+
+//leetcode 3035
+int maxPalindromesAfterOperations(vector<string>& words) {
+        ranges::sort(words, [](string a, string b){
+            return a.length() > b.length();
+        });
+        int odd_s = 0, odd_c = 0;
+        int mygo[200] = {0};
+        for(auto &i : words){
+            odd_s += i.length() % 2;
+            for(char &j : i)
+                mygo[j] ^= 1;
+        }
+        for(int i = 'a'; i <= 'z'; ++i)
+            odd_c += mygo[i];
+        if(odd_s >= odd_c) return words.size();
+        odd_c -= odd_s;
+        int ans = words.size();
+        for(auto &i : words){
+            if(odd_c <= 0) break;
+            odd_c -= i.length()/2*2;
+            --ans;
+        }
+        return ans;
+    }
