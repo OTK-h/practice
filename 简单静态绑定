@@ -1,0 +1,100 @@
+// 请在测评文件的Class.cpp中完成你的实现
+#include <iostream>
+#include <string>
+
+/* 加入你需要的头文件 */
+#include <vector>
+
+using namespace std;
+
+class Class;
+struct Function;
+struct CallSite;
+bool call(CallSite cs);
+
+struct CallSite {
+    const Class& base;
+    string function_name;
+    const Class& arg;
+};
+
+class Class {
+private:
+    string name;
+    const Class* parent;
+    vector<Function> funcs;
+
+public:
+    Class(const string& name_) {
+        name = name_;
+        parent = nullptr;
+    }
+    bool operator==(const Class& c) const { return name == c.name; }
+    string get_name() const { return name; };
+
+    void add_function(const Function& f);
+    void inherit(const Class& c);
+    friend bool call(CallSite cs);
+
+    bool is_ancestor(const Class& c) const;
+};
+
+struct Function {
+    string name;
+    const Class& arg;
+    bool operator==(const Function& f_) const {
+        return name == f_.name && arg.get_name() == f_.arg.get_name();
+    }
+    bool operator<(const Function& f_) const {
+        return name < f_.name ||
+            (name == f_.name && arg.get_name() < f_.arg.get_name());
+    }
+};
+
+void Class::add_function(const Function& f) {
+    for (auto i : funcs) {
+        if (i == f)
+            return;
+    }
+    funcs.push_back(f);
+}
+
+void Class::inherit(const Class& c) {
+    parent = &c;
+}
+
+bool call(CallSite cs) {
+    const Class* p_arg = &cs.arg;
+    const Class* p_base = &cs.base;
+    while (p_base) {
+        p_arg = &cs.arg;
+        while (p_arg) {
+            Function temp = { cs.function_name, *p_arg };
+            for (auto i : p_base->funcs) {
+                if (i == temp) {
+                    cout << p_base->get_name() << "::" << cs.function_name << "(" << p_arg->get_name() << ")\n";
+                    return 1;
+                }
+            }
+            p_arg = p_arg->parent;
+        }
+        for (auto i : p_base->funcs) {
+            if (i.name == cs.function_name) {
+                cout << "Function not found.\n";
+                return 0;
+            }
+        }
+        p_base = p_base->parent;
+    }
+    cout << "Function not found.\n";
+    return 0;
+}
+
+bool Class::is_ancestor(const Class& c) const {
+    const Class* p = parent;
+    while (p != nullptr) {
+        if (p == &c) return 1;
+        p = p->parent;
+    }
+    return 0;
+}
