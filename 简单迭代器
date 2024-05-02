@@ -1,0 +1,73 @@
+// TODO: finish the following class, and override the corresponding operator
+
+class MyArray {
+    int size;
+    int* arr;
+    bool* judge;
+public:
+    class Iterator {
+        int* cur;
+        int* beg;
+        int* end;
+        bool* mygo;
+    public:
+        Iterator(int* a, int* b, int* c, bool* d) :cur(a), beg(b), end(c), mygo(d) {};
+        ~Iterator() { cur = end; beg = end; }
+        bool get(int& value) const {
+            if (cur >= beg && cur < end && !*mygo) {
+                value = *(cur);
+                return 1;
+            }
+            return 0;
+        }
+        bool put(int value) {
+            if (cur >= beg && cur < end && !*mygo) {
+                *cur = value;
+                return 1;
+            }
+            return 0;
+        }
+        bool operator ==(const Iterator& temp) const {
+            return cur == temp.cur && beg == temp.beg && end == temp.end;
+        }
+        bool operator !=(const Iterator& temp) const {
+            return !(*this == temp);
+        };
+        Iterator& operator ++() {
+            ++cur; return *this;
+        }
+        Iterator& operator --() {
+            --cur; return *this;
+        }
+        const Iterator operator ++(int) {
+            Iterator temp = *this;
+            ++(*this);
+            return temp;
+        }
+        const Iterator operator --(int) {
+            Iterator temp = *this;
+            --(*this);
+            return temp;
+        }
+        Iterator operator +(int len) {
+            return Iterator(cur + len, beg, end, mygo);
+        }
+        Iterator operator -(int len) {
+            return Iterator(cur - len, beg, end, mygo);
+        }
+    };
+
+public:
+    MyArray(int sz) :size(sz), arr(new int[size]()), judge(new bool[1]()) {}
+    ~MyArray() {
+        delete[] arr;
+        size = 0;
+        *judge = 1;
+    }
+    Iterator begin() {
+        return Iterator(arr, arr, arr + size, judge);
+    }
+    Iterator end() {
+        return Iterator(arr + size, arr, arr + size, judge);
+    }
+};
