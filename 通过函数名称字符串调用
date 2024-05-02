@@ -1,0 +1,98 @@
+#include <string>
+using namespace std;
+
+class CallMyName
+{
+    void** all_functions;
+public:
+    CallMyName(void* af[5]) {
+        all_functions = af;
+    }
+    int call(const string& my_call)
+    {
+        //TODO
+        string temp[5] = { "funcMyAbs", "funcMySub","funcMyHash","funcMyAdd", "funcMySum" };
+        int index = 0;
+        for (; index < 5; ++index) {
+            int i = 0;
+            for (; i < temp[index].length(); ++i) {
+                if (my_call[i] != temp[index][i])
+                    break;
+            }
+            if (i == temp[index].length())
+                break;
+        }
+        if (index == 0) {
+            int k = 0;
+            int x = 1;
+            for (; my_call[k] != '('; ++k); ++k;
+            int a = 0;
+            if (my_call[k] == '-') {
+                x = -1;
+                ++k;
+            }
+            for (; my_call[k] != ')'; ++k)
+                a = a * 10 + my_call[k] - '0';
+            a *= x;
+            int (*fp)(int) = (int(*)(int))(all_functions[index]);
+            return (*fp)(a);
+        }
+        else if (index == 4) {
+            int a = 0, b = 0, c = 0;
+            int k = 0;
+            for (; my_call[k] != '('; ++k); ++k;
+            int x1 = 1;
+            if (my_call[k] == '-') {
+                x1 = -1;
+                ++k;
+            }
+            for (; my_call[k] != ','; ++k)
+                a = a * 10 + my_call[k] - '0';
+            a *= x1;
+            ++k;
+            int x2 = 1;
+            if (my_call[k] == '-') {
+                x2 = -1;
+                ++k;
+            }
+            for (; my_call[k] != ','; ++k)
+                b = b * 10 + my_call[k] - '0';
+            b *= x2;
+            ++k;
+            int x3 = 1;
+            if (my_call[k] == '-') {
+                x3 = -1;
+                ++k;
+            }
+            for (; my_call[k] != ')'; ++k)
+                c = c * 10 + my_call[k] - '0';
+            c *= x3;
+            int (*fp)(int, int, int) = (int(*)(int, int, int))(all_functions[index]);
+            return (*fp)(a, b, c);
+        }
+        else {
+            int a = 0, b = 0;
+            int k = 0;
+            for (; my_call[k] != '('; ++k); ++k;
+            int x1 = 1;
+            if (my_call[k] == '-') {
+                x1 = -1;
+                ++k;
+            }
+            for (; my_call[k] != ','; ++k)
+                a = a * 10 + my_call[k] - '0';
+            a *= x1;
+            ++k;
+            int x2 = 1;
+            if (my_call[k] == '-') {
+                x2 = -1;
+                ++k;
+            }
+            for (; my_call[k] != ')'; ++k)
+                b = b * 10 + my_call[k] - '0';
+            b *= x2;
+            int (*fp)(int, int) = (int(*)(int, int))(all_functions[index]);
+            return (*fp)(a, b);
+        }
+    }
+};
