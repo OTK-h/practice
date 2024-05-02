@@ -1,0 +1,70 @@
+#include <vector>
+#include <iostream>
+using namespace std;
+
+typedef int (*map_func)(int);
+typedef bool (*filter_func)(int);
+
+class Vector {
+public:
+	Vector(const vector<int>& vec) : vec_(vec) {}
+
+	Vector filter(filter_func f) const;
+	Vector map(map_func f) const;
+	Vector& for_each(map_func f);
+
+	void output() const;
+
+private:
+	vector<int> vec_;
+};
+
+
+
+void Vector::output() const {
+    int n = vec_.size();
+    for (int i = 0; i < n; ++i) {
+        cout << vec_[i] << ' ';
+    }
+    cout << '\n';
+}
+
+Vector Vector::map(map_func f) const {
+    int n = vec_.size();
+    vector<int> mygo;
+    for (int i = 0; i < n; ++i) {
+        mygo.push_back(f(vec_[i]));
+    }
+    Vector ans(mygo);
+    return ans;
+}
+
+Vector Vector::filter(filter_func f) const {
+    int n = vec_.size();
+    vector<int> mygo;
+    for (int i = 0; i < n; ++i) {
+        if (f(vec_[i])) {
+            mygo.push_back(vec_[i]);
+        }
+    }
+    Vector ans(mygo);
+    return ans;
+}
+
+Vector& Vector::for_each(map_func f) {
+    int n = vec_.size();
+    for (int i = 0; i < n; ++i) {
+        vec_[i] = f(vec_[i]);
+    }
+    Vector mygo(vec_);
+    return *this;
+}
+
+//bool is_even(int x) {
+//    return x % 2 == 0;
+//}
+//bool is_neg(int x) {
+//    return x < 0;
+//}
+//Vector better_vec({ -1, -2, 3, 4 });
+//better_vec.filter(is_even).filter(is_neg).output(); //-2
