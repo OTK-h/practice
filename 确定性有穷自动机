@@ -1,0 +1,60 @@
+#pragma once
+#include<bits/stdc++.h>
+#include<unordered_map>
+#include <utility>
+using namespace std;
+
+class my_fsm {
+    vector<string> accept_state;
+    vector<string> list;
+    string cur_state;
+    string start_state;
+    map<pair<string, char>, string> mygo;
+public:
+    // 构造函数，参数为所有的状态集合
+    my_fsm(const string& start, const vector<string>& state_list) : start_state(start), list(state_list), cur_state(start) {};
+
+    // 添加一个状态转移。该转移从 src 出发，接收符号 symbol 后转移到状态 dest
+    bool add_transit(const string& src, const string& dest, char symbol);
+
+    // 将一个状态加入接收状态集合
+    bool add_accept_state(const string& state);
+
+    // 启动自动机，判断该串是否是该自动机的语言(能到达接受状态)
+    // 输入可能分为多段，请保留状态
+    bool execute(const string& input);
+
+
+    // 请自由添加任意需要的内容
+};
+
+
+bool my_fsm::add_accept_state(const string& state) {
+    for (string i : accept_state) {
+        if (i == state)  return 0;
+    }
+    accept_state.push_back(state);
+    return 1;
+}
+
+bool my_fsm::add_transit(const string& src, const string& dest, char symbol) {
+    pair<string, char> temp(src, symbol);
+    if (mygo.find(make_pair(src, symbol)) == mygo.end()) {
+        mygo[temp] = dest;
+        return 1;
+    }
+    return 0;
+}
+
+bool my_fsm::execute(const std::string& input) {
+    int n = input.length();
+    cur_state = start_state;
+    for (char c : input) {
+        if (mygo.find(make_pair(cur_state, c)) == mygo.end()) return 0;
+        cur_state = mygo[make_pair(cur_state, c)];
+    }
+    for (string i : accept_state) {
+        if (cur_state == i) return 1;
+    }
+    return 0;
+}
